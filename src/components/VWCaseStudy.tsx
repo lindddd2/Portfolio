@@ -366,8 +366,8 @@ function OverviewView({ setSubView }: { setSubView: (v: SubView) => void }) {
 /* ════════════════════════════════════════ CHALLENGES ════════════════════════════════════════ */
 function ChallengesView({ activeChallenge, setActiveChallenge }: { activeChallenge: string | null; setActiveChallenge: (id: string | null) => void }) {
   return (
-    <div className="pt-28 pb-32 px-6 md:px-12">
-      <div className="max-w-[1200px] mx-auto">
+    <div className="min-h-screen flex flex-col justify-center px-6 md:px-12 py-24">
+      <div className="max-w-[1200px] mx-auto w-full">
         <motion.div {...fade(0.1)} className="mb-12">
           <div className="flex items-center gap-3 mb-4 text-xs font-semibold tracking-[0.15em] uppercase" style={{ color: '#c8913a' }}>
             <span className="w-8 h-px" style={{ background: 'rgba(200,145,58,0.4)' }} />
@@ -378,94 +378,111 @@ function ChallengesView({ activeChallenge, setActiveChallenge }: { activeChallen
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        {/* Challenge cards — 3 equal columns with flip */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" style={{ perspective: '1200px' }}>
           {challenges.map((ch, i) => {
             const Icon = ch.icon
-            const isActive = activeChallenge === ch.id
-            return (
-              <motion.button key={ch.id}
-                className="text-left p-6 rounded-2xl transition-all duration-300 cursor-pointer border-none relative overflow-hidden"
-                style={{
-                  background: isActive ? 'rgba(200,145,58,0.06)' : '#161310',
-                  border: `1px solid ${isActive ? 'rgba(200,145,58,0.2)' : 'rgba(255,255,255,0.04)'}`,
-                }}
-                onClick={() => setActiveChallenge(isActive ? null : ch.id)}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
-                whileHover={{ borderColor: 'rgba(200,145,58,0.15)', scale: 1.01 }}>
-                {isActive && (
-                  <motion.div className="absolute inset-0 pointer-events-none"
-                    style={{ background: 'linear-gradient(135deg, rgba(200,145,58,0.04), transparent)', width: '200%' }}
-                    animate={{ x: ['-100%', '100%'] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: 'linear' }} />
-                )}
-                <div className="relative flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                       style={{ background: isActive ? 'rgba(200,145,58,0.1)' : 'rgba(200,145,58,0.04)' }}>
-                    <Icon size={18} style={{ color: '#c8913a' }} strokeWidth={1.5} />
-                  </div>
-                  <motion.div className="px-2 py-0.5 rounded text-[9px] font-bold font-mono"
-                    style={{ background: 'rgba(200,145,58,0.08)', color: '#c8913a' }}
-                    animate={isActive ? { opacity: [0.7, 1, 0.7] } : {}}
-                    transition={{ duration: 2, repeat: Infinity }}>ACTIVE</motion.div>
-                </div>
-                <h3 className="relative text-sm font-bold mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif", color: isActive ? '#f2f0ed' : '#8a857e' }}>{ch.short}</h3>
-                <p className="relative text-[11px]" style={{ color: '#3a3530' }}>{ch.title}</p>
-                <ChevronRight size={14} className="relative mt-3"
-                  style={{ color: isActive ? '#c8913a' : '#3a3530', transform: isActive ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
-              </motion.button>
-            )
-          })}
-        </div>
+            const isFlipped = activeChallenge === ch.id
 
-        <AnimatePresence mode="wait">
-          {activeChallenge && (() => {
-            const ch = challenges.find(c => c.id === activeChallenge)!
-            const Icon = ch.icon
             return (
-              <motion.div key={activeChallenge}
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
-                <BorderGlow backgroundColor="#0f0d0a" borderRadius={24} glowColor="38 70 55"
-                  glowRadius={25} glowIntensity={0.5} edgeSensitivity={25} coneSpread={30}
-                  colors={['#c8913a', '#e8c875', '#6a5530']} fillOpacity={0.15}>
-                  <div className="p-8 md:p-10">
-                    <div className="flex items-start justify-between mb-8 flex-wrap gap-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                             style={{ background: 'rgba(200,145,58,0.08)', border: '1px solid rgba(200,145,58,0.12)' }}>
+              <div key={ch.id} className="cursor-pointer" style={{ height: 260 }}
+                   onClick={() => setActiveChallenge(isFlipped ? null : ch.id)}>
+                <motion.div
+                  className="relative w-full h-full"
+                  style={{ transformStyle: 'preserve-3d' }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0, rotateY: isFlipped ? 180 : 0 }}
+                  transition={{ rotateY: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }, opacity: { delay: 0.15 + i * 0.1, duration: 0.5 }, y: { delay: 0.15 + i * 0.1, duration: 0.5 } }}
+                >
+                  {/* ── FRONT ── */}
+                  <div className="absolute inset-0 rounded-2xl overflow-hidden group"
+                       style={{ backfaceVisibility: 'hidden', background: '#161310', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    {/* Top accent bar */}
+                    <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(200,145,58,0.3), transparent)' }} />
+
+                    {/* Shimmer */}
+                    <motion.div className="absolute inset-0 pointer-events-none"
+                      style={{ background: 'linear-gradient(135deg, transparent, rgba(200,145,58,0.03), transparent)', width: '200%' }}
+                      animate={{ x: ['-100%', '100%'] }}
+                      transition={{ duration: 5, repeat: Infinity, ease: 'linear', delay: i * 1.2 }} />
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                         style={{ background: 'radial-gradient(circle at 50% 0%, rgba(200,145,58,0.08), transparent 60%)' }} />
+
+                    <div className="relative p-6 h-full flex flex-col">
+                      {/* Icon + badge */}
+                      <div className="flex items-center gap-3 mb-4">
+                        <motion.div className="w-12 h-12 rounded-xl flex items-center justify-center"
+                          style={{ background: 'rgba(200,145,58,0.06)', border: '1px solid rgba(200,145,58,0.1)' }}
+                          animate={{ boxShadow: ['0 0 0px rgba(200,145,58,0)', '0 0 12px rgba(200,145,58,0.1)', '0 0 0px rgba(200,145,58,0)'] }}
+                          transition={{ duration: 3, repeat: Infinity, delay: i * 0.8 }}>
                           <Icon size={22} style={{ color: '#c8913a' }} strokeWidth={1.5} />
+                        </motion.div>
+                        <div className="flex-1">
+                          <h3 className="text-base font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#f2f0ed' }}>{ch.short}</h3>
+                          <p className="text-[10px]" style={{ color: '#5a5650' }}>{ch.title}</p>
                         </div>
-                        <h3 className="text-xl md:text-2xl font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#f2f0ed' }}>{ch.title}</h3>
                       </div>
-                      <div className="flex gap-3">
-                        {ch.metrics.map(m => (
-                          <div key={m.label} className="px-3 py-2 rounded-lg text-center"
-                               style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                            <div className="text-xs font-bold" style={{ color: '#c8913a' }}>{m.value}</div>
-                            <div className="text-[9px]" style={{ color: '#3a3530' }}>{m.label}</div>
+
+                      {/* Visual metrics with progress bars */}
+                      <div className="flex-1 flex flex-col justify-center gap-3">
+                        {ch.metrics.map((m, mi) => (
+                          <div key={m.label}>
+                            <div className="flex justify-between items-baseline mb-1">
+                              <span className="text-[10px] uppercase tracking-wide" style={{ color: '#5a5650' }}>{m.label}</span>
+                              <span className="text-sm font-bold font-mono" style={{ color: '#c8913a' }}>{m.value}</span>
+                            </div>
+                            <div className="h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                              <motion.div className="h-full rounded-full"
+                                style={{ background: 'linear-gradient(90deg, #c8913a, #e8c875)' }}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${30 + mi * 25}%` }}
+                                transition={{ delay: 0.5 + mi * 0.15, duration: 1, ease: [0.16, 1, 0.3, 1] }} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Bottom hint */}
+                      <div className="flex items-center justify-between pt-3 mt-auto" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                        <motion.span className="px-2 py-0.5 rounded text-[9px] font-bold font-mono"
+                          style={{ background: 'rgba(200,145,58,0.08)', color: '#c8913a' }}
+                          animate={{ opacity: [0.5, 1, 0.5] }}
+                          transition={{ duration: 2.5, repeat: Infinity }}>ACTIVE</motion.span>
+                        <span className="text-[10px] flex items-center gap-1" style={{ color: '#3a3530' }}>
+                          Tap to explore <ChevronRight size={10} />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── BACK ── */}
+                  <div className="absolute inset-0 rounded-2xl overflow-hidden"
+                       style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: '#131110', border: '1px solid rgba(200,145,58,0.15)' }}>
+                    {/* Top accent */}
+                    <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, #c8913a, #e8c875, #c8913a)' }} />
+
+                    <div className="relative p-5 h-full flex flex-col overflow-y-auto">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Icon size={16} style={{ color: '#c8913a' }} strokeWidth={1.5} />
+                        <h3 className="text-sm font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#f2f0ed' }}>{ch.short}</h3>
+                        <span className="ml-auto text-[9px]" style={{ color: '#3a3530' }}>← Back</span>
+                      </div>
+                      <div className="flex flex-col gap-2 flex-1">
+                        {ch.strategies.map((s) => (
+                          <div key={s.name} className="p-3 rounded-lg"
+                               style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)' }}>
+                            <h4 className="text-[11px] font-bold mb-0.5" style={{ color: '#f2f0ed' }}>{s.name}</h4>
+                            <p className="text-[10px] leading-relaxed" style={{ color: '#5a5650' }}>{s.desc}</p>
                           </div>
                         ))}
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {ch.strategies.map((s, i) => (
-                        <motion.div key={s.name} className="p-5 rounded-xl"
-                          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)' }}
-                          initial={{ opacity: 0, x: -15 }} animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.08, duration: 0.4 }}>
-                          <h4 className="text-sm font-bold mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#f2f0ed' }}>{s.name}</h4>
-                          <p className="text-xs leading-relaxed" style={{ color: '#6a6560' }}>{s.desc}</p>
-                        </motion.div>
-                      ))}
-                    </div>
                   </div>
-                </BorderGlow>
-              </motion.div>
+                </motion.div>
+              </div>
             )
-          })()}
-        </AnimatePresence>
+          })}
+        </div>
       </div>
     </div>
   )
