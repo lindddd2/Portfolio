@@ -304,56 +304,84 @@ function OverviewView({ setSubView }: { setSubView: (v: SubView) => void }) {
         </div>
       </header>
 
-      {/* ═══ BOTTOM: Quick Access + Takeaways side by side ═══ */}
-      <div className="px-6 md:px-12">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-6 items-start">
-          {/* Quick Access panel */}
-          <motion.div {...fade(0.5)} className="rounded-2xl p-6"
-            style={{ background: '#161310', border: '1px solid rgba(255,255,255,0.04)' }}>
-            <p className="text-[10px] font-bold tracking-[0.15em] uppercase mb-5" style={{ color: '#5a5650' }}>Quick Access</p>
-            <div className="flex gap-5">
-              {[
-                { label: 'Challenges', icon: Shield, view: 'challenges' as SubView },
-                { label: 'Document', icon: BookOpen, view: 'docs' as SubView },
-              ].map((item) => {
-                const Icon = item.icon
-                return (
-                  <motion.button key={item.label}
-                    className="flex flex-col items-center gap-2.5 cursor-pointer bg-transparent border-none group"
-                    onClick={() => { setSubView(item.view); window.scrollTo(0, 0); }}
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.95 }}>
-                    <div className="w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-200"
-                         style={{
-                           background: 'rgba(200,145,58,0.04)',
-                           border: '1.5px solid rgba(200,145,58,0.1)',
-                           clipPath: 'polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%)',
-                         }}>
-                      <Icon size={22} style={{ color: '#c8913a' }} strokeWidth={1.5} />
-                    </div>
-                    <span className="text-[10px] font-semibold tracking-wide uppercase" style={{ color: '#5a5650' }}>{item.label}</span>
-                  </motion.button>
-                )
-              })}
-            </div>
+      {/* ═══ DIVIDER + BOTTOM SECTION ═══ */}
+      <div className="px-6 md:px-12 mt-24 mb-8">
+        <div className="max-w-[1200px] mx-auto">
+          {/* Animated divider */}
+          <div className="relative h-px overflow-hidden rounded-full mb-16" style={{ background: 'rgba(255,255,255,0.04)' }}>
+            <motion.div className="absolute inset-y-0 w-1/4 rounded-full"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(200,145,58,0.4), transparent)' }}
+              animate={{ x: ['-100%', '500%'] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
+          </div>
+
+          {/* Section label */}
+          <motion.div {...fade(0.2)} className="text-center mb-10">
+            <p className="text-[10px] font-bold tracking-[0.2em] uppercase mb-3" style={{ color: '#c8913a' }}>Navigate & Explore</p>
+            <h3 className="text-xl md:text-2xl font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#f2f0ed' }}>
+              Dive deeper into the project
+            </h3>
           </motion.div>
 
-          {/* Takeaway cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Quick Access + Takeaways in unified layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            {/* Quick Access — spans 2 cols */}
+            <motion.div {...fade(0.3)} className="lg:col-span-2 rounded-2xl p-8 relative overflow-hidden"
+              style={{ background: '#161310', border: '1px solid rgba(255,255,255,0.04)' }}>
+              {/* Subtle glow */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] rounded-full pointer-events-none"
+                   style={{ background: 'radial-gradient(ellipse, rgba(200,145,58,0.04) 0%, transparent 70%)' }} />
+
+              <p className="relative text-[10px] font-bold tracking-[0.15em] uppercase mb-6" style={{ color: '#5a5650' }}>Quick Access</p>
+              <div className="relative flex gap-6 justify-center">
+                {[
+                  { label: 'Challenges', icon: Shield, view: 'challenges' as SubView },
+                  { label: 'Document', icon: BookOpen, view: 'docs' as SubView },
+                ].map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <motion.button key={item.label}
+                      className="flex flex-col items-center gap-3 cursor-pointer bg-transparent border-none group"
+                      onClick={() => { setSubView(item.view); window.scrollTo(0, 0); }}
+                      whileHover={{ scale: 1.08, y: -3 }}
+                      whileTap={{ scale: 0.95 }}>
+                      <motion.div className="w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-200"
+                        style={{
+                          background: 'rgba(200,145,58,0.04)',
+                          border: '1.5px solid rgba(200,145,58,0.1)',
+                          clipPath: 'polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%)',
+                        }}
+                        animate={{ boxShadow: ['0 0 0px rgba(200,145,58,0)', '0 0 15px rgba(200,145,58,0.08)', '0 0 0px rgba(200,145,58,0)'] }}
+                        transition={{ duration: 3, repeat: Infinity }}>
+                        <Icon size={22} style={{ color: '#c8913a' }} strokeWidth={1.5} />
+                      </motion.div>
+                      <span className="text-[10px] font-semibold tracking-wide uppercase transition-colors group-hover:text-[#c8913a]" style={{ color: '#5a5650' }}>{item.label}</span>
+                    </motion.button>
+                  )
+                })}
+              </div>
+            </motion.div>
+
+            {/* 3 Takeaway cards — each 1 col */}
             {[
-              { title: 'Convince the Past', desc: 'Retain combustion customers and guide them through the EV transition within VW\'s ecosystem.' },
-              { title: 'Win the Future', desc: 'Capture younger audiences through flexible mobility solutions and renewed brand positioning.' },
-              { title: 'Stay Ahead of the Curve', desc: 'Simplify the lineup and invest in autonomous driving to lead the next wave.' },
+              { title: 'Convince the Past', desc: 'Retain combustion customers and guide them through the EV transition within VW\'s ecosystem.', num: '01' },
+              { title: 'Win the Future', desc: 'Capture younger audiences through flexible mobility solutions and renewed brand positioning.', num: '02' },
+              { title: 'Stay Ahead of the Curve', desc: 'Simplify the lineup and invest in autonomous driving to lead the next wave.', num: '03' },
             ].map((item, i) => (
               <motion.div key={item.title}
-                className="p-6 rounded-2xl"
+                className="rounded-2xl p-6 relative overflow-hidden group"
                 style={{ background: '#161310', border: '1px solid rgba(255,255,255,0.04)' }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-                whileHover={{ borderColor: 'rgba(200,145,58,0.1)', scale: 1.02 }}>
-                <h3 className="text-sm font-bold mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#f2f0ed' }}>{item.title}</h3>
-                <p className="text-[11px] leading-relaxed" style={{ color: '#6a6560' }}>{item.desc}</p>
+                transition={{ delay: 0.4 + i * 0.1 }}
+                whileHover={{ borderColor: 'rgba(200,145,58,0.1)' }}>
+                {/* Number watermark */}
+                <span className="absolute top-3 right-4 text-4xl font-black" style={{ color: 'rgba(200,145,58,0.04)', fontFamily: "'Space Grotesk', sans-serif" }}>{item.num}</span>
+                {/* Hover glow */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                     style={{ background: 'radial-gradient(circle at 50% 0%, rgba(200,145,58,0.04), transparent 60%)' }} />
+                <h3 className="relative text-sm font-bold mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#f2f0ed' }}>{item.title}</h3>
+                <p className="relative text-[11px] leading-relaxed" style={{ color: '#6a6560' }}>{item.desc}</p>
               </motion.div>
             ))}
           </div>
